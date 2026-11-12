@@ -1,0 +1,1155 @@
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Attendance Tracker</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0b1120;
+      --card: #151f32;
+      --card2: #1b2940;
+      --border: #293951;
+      --text: #edf3ff;
+      --muted: #9aabc4;
+      --blue: #5794ff;
+      --green: #24c78a;
+      --red: #ff647c;
+      --yellow: #f5bd4f;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1150px;
+      margin: auto;
+    }
+
+    header {
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    header p, .muted {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: 19px;
+      margin-bottom: 16px;
+    }
+
+    .section {
+      margin-bottom: 28px;
+    }
+
+    .subject-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .subject-card {
+      position: relative;
+    }
+
+    .subject-card h3 {
+      font-size: 17px;
+      margin-bottom: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .percentage {
+      font-size: 30px;
+      font-weight: bold;
+      margin: 8px 0;
+    }
+
+    .progress {
+      height: 8px;
+      background: #29364b;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.3s;
+    }
+
+    .green { background: var(--green); }
+    .yellow { background: var(--yellow); }
+    .red { background: var(--red); }
+
+    .subject-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    button {
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-blue {
+      background: var(--blue);
+      color: white;
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #06271c;
+    }
+
+    .btn-red {
+      background: var(--red);
+      color: #350914;
+    }
+
+    .btn-yellow {
+      background: var(--yellow);
+      color: #342200;
+    }
+
+    .btn-gray {
+      background: #34445d;
+      color: white;
+    }
+
+    .btn-small {
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 15px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0e192b;
+      color: white;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--blue);
+    }
+
+    .attendance-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .attendance-buttons button {
+      padding: 14px 8px;
+      font-size: 14px;
+    }
+
+    .form-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .advice {
+      background: var(--card2);
+      border-radius: 9px;
+      padding: 12px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .history-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .history-info strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .history-info small {
+      color: var(--muted);
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .status-Present {
+      background: #123e32;
+      color: #5ce5b1;
+    }
+
+    .status-Absent {
+      background: #4a1d2a;
+      color: #ff8b9d;
+    }
+
+    .status-Cancelled {
+      background: #49391b;
+      color: #ffd477;
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 25px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .editing-note {
+      display: none;
+      color: var(--yellow);
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      header h1 {
+        font-size: 25px;
+      }
+
+      .attendance-buttons {
+        gap: 6px;
+      }
+
+      .attendance-buttons button {
+        font-size: 12px;
+        padding: 12px 5px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header>
+      <h1>My Attendance Tracker</h1>
+      <p>Track every subject, manage extra classes, and stay above your attendance requirements.</p>
+    </header>
+
+    <!-- SUBJECT-WISE DASHBOARD -->
+    <section class="section">
+      <h2>Subject-wise Attendance</h2>
+      <div id="subjectDashboard" class="subject-grid"></div>
+    </section>
+
+    <!-- ADD SUBJECT -->
+    <section class="section card">
+      <h2>Add a Subject</h2>
+
+      <form id="subjectForm" class="form-grid">
+        <div>
+          <label for="subjectName">Subject name</label>
+          <input
+            type="text"
+            id="subjectName"
+            placeholder="e.g. Engineering Mathematics"
+            required
+          >
+        </div>
+
+        <button type="submit" class="btn-blue">+ Add Subject</button>
+      </form>
+    </section>
+
+    <!-- MARK ATTENDANCE -->
+    <section class="section card">
+      <h2>Record Attendance</h2>
+
+      <div class="form-grid">
+        <div>
+          <label for="attendanceSubject">Select subject</label>
+          <select id="attendanceSubject">
+            <option value="">Select a subject</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="attendanceDate">Class date</label>
+          <input type="date" id="attendanceDate">
+        </div>
+      </div>
+
+      <div class="attendance-buttons">
+        <button type="button" class="btn-green" id="presentBtn">
+          ✓ Present
+        </button>
+
+        <button type="button" class="btn-red" id="absentBtn">
+          ✕ Absent
+        </button>
+
+        <button type="button" class="btn-yellow" id="cancelledBtn">
+          — Cancelled
+        </button>
+      </div>
+
+      <p class="form-note">
+        Each button records one separate class. If you had two or more lectures
+        of the same subject on one day, click the appropriate button once for
+        each class. Cancelled classes are excluded from attendance calculations.
+      </p>
+
+      <p id="editingNote" class="editing-note">
+        You are editing an existing record. Choose the updated status above to save it.
+      </p>
+
+      <button
+        type="button"
+        id="cancelEditBtn"
+        class="btn-gray btn-small"
+        style="display:none; margin-top:12px;"
+      >
+        Cancel editing
+      </button>
+    </section>
+
+    <!-- ATTENDANCE HISTORY -->
+    <section class="section">
+      <div class="history-header">
+        <h2>Attendance History</h2>
+
+        <div class="top-actions">
+          <button class="btn-blue" id="exportBtn">Export CSV</button>
+          <button class="btn-gray" id="clearFilterBtn">Show All</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:15px;">
+        <label for="historyFilter">Filter by subject</label>
+        <select id="historyFilter">
+          <option value="all">All subjects</option>
+        </select>
+      </div>
+
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+  </div>
+
+  <script>
+    // -------------------------------------
+    // SETTINGS
+    // -------------------------------------
+
+    const MINIMUM = 75;
+    const TARGET = 80;
+    const STORAGE_KEY = "engineeringAttendance_v2";
+
+    const $ = (id) => document.getElementById(id);
+
+    let subjects = [];
+    let records = [];
+    let editingRecordId = null;
+    let activeFilter = "all";
+
+
+    // -------------------------------------
+    // DATA AND STORAGE
+    // -------------------------------------
+
+    function createId() {
+      return Date.now().toString(36) +
+        Math.random().toString(36).slice(2, 9);
+    }
+
+    function loadData() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+        if (saved && Array.isArray(saved.subjects) &&
+            Array.isArray(saved.records)) {
+          subjects = saved.subjects;
+          records = saved.records;
+        } else {
+          subjects = [];
+          records = [];
+        }
+      } catch (error) {
+        subjects = [];
+        records = [];
+      }
+
+      // Ensure every subject and record has an ID.
+      subjects = subjects.map(subject => ({
+        id: subject.id || createId(),
+        name: subject.name || "Untitled Subject"
+      }));
+
+      records = records.map(record => {
+        let subjectId = record.subjectId;
+
+        // Support older records that stored the subject name directly.
+        if (!subjectId && record.subject) {
+          let existing = subjects.find(
+            subject => subject.name === record.subject
+          );
+
+          if (!existing) {
+            existing = {
+              id: createId(),
+              name: record.subject
+            };
+            subjects.push(existing);
+          }
+
+          subjectId = existing.id;
+        }
+
+        return {
+          id: record.id || createId(),
+          subjectId,
+          date: record.date,
+          status: record.status
+        };
+      }).filter(record =>
+        record.subjectId &&
+        record.date &&
+        ["Present", "Absent", "Cancelled"].includes(record.status)
+      );
+
+      saveData();
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        subjects,
+        records
+      }));
+    }
+
+
+    // -------------------------------------
+    // ATTENDANCE CALCULATIONS
+    // -------------------------------------
+
+    function calculate(subjectId) {
+      const subjectRecords = records.filter(record =>
+        record.subjectId === subjectId &&
+        record.status !== "Cancelled"
+      );
+
+      const total = subjectRecords.length;
+
+      const present = subjectRecords.filter(
+        record => record.status === "Present"
+      ).length;
+
+      const absent = subjectRecords.filter(
+        record => record.status === "Absent"
+      ).length;
+
+      const percentage = total === 0
+        ? 0
+        : (present / total) * 100;
+
+      return {
+        total,
+        present,
+        absent,
+        percentage
+      };
+    }
+
+    function calculateAdvice(stats) {
+      const { total, present, percentage } = stats;
+
+      if (total === 0) {
+        return "No classes recorded yet. Start adding your attendance.";
+      }
+
+      // Number of consecutive classes needed to reach 80%.
+      const needed = Math.max(
+        0,
+        Math.ceil(
+          (TARGET * total / 100 - present) /
+          (1 - TARGET / 100) - 0.0000001
+        )
+      );
+
+      // Maximum additional absences possible while staying at 80%.
+      const safeAbsences = Math.max(
+        0,
+        Math.floor(
+          present / (TARGET / 100) - total + 0.0000001
+        )
+      );
+
+      if (percentage >= TARGET) {
+        return `You are on track. You can miss approximately ${safeAbsences} more class(es) and remain at or above ${TARGET}%, assuming no other classes are added as present.`;
+      }
+
+      if (percentage >= MINIMUM) {
+        return `You meet the ${MINIMUM}% minimum, but are below your ${TARGET}% target. Attend the next ${needed} consecutive class(es) to reach ${TARGET}%.`;
+      }
+
+      return `You are below the ${MINIMUM}% minimum. Attend the next ${needed} consecutive class(es) without missing any to reach ${TARGET}%.`;
+    }
+
+    function getPercentageColor(percentage, total) {
+      if (total === 0) return "yellow";
+      if (percentage >= TARGET) return "green";
+      if (percentage >= MINIMUM) return "yellow";
+      return "red";
+    }
+
+
+    // -------------------------------------
+    // SUBJECT DROPDOWNS
+    // -------------------------------------
+
+    function renderSubjectDropdowns() {
+      const attendanceSelect = $("attendanceSubject");
+      const historySelect = $("historyFilter");
+
+      const currentSubject = attendanceSelect.value;
+      const currentFilter = activeFilter;
+
+      attendanceSelect.innerHTML =
+        '<option value="">Select a subject</option>';
+
+      historySelect.innerHTML =
+        '<option value="all">All subjects</option>';
+
+      subjects.forEach(subject => {
+        const option1 = document.createElement("option");
+        option1.value = subject.id;
+        option1.textContent = subject.name;
+        attendanceSelect.appendChild(option1);
+
+        const option2 = document.createElement("option");
+        option2.value = subject.id;
+        option2.textContent = subject.name;
+        historySelect.appendChild(option2);
+      });
+
+      if (subjects.some(subject => subject.id === currentSubject)) {
+        attendanceSelect.value = currentSubject;
+      }
+
+      if (
+        currentFilter === "all" ||
+        subjects.some(subject => subject.id === currentFilter)
+      ) {
+        historySelect.value = currentFilter;
+      }
+    }
+
+
+    // -------------------------------------
+    // SUBJECT-WISE DASHBOARD
+    // -------------------------------------
+
+    function renderDashboard() {
+      const dashboard = $("subjectDashboard");
+      dashboard.innerHTML = "";
+
+      if (subjects.length === 0) {
+        dashboard.innerHTML =
+          '<div class="empty">No subjects added yet. Add your first subject below.</div>';
+        return;
+      }
+
+      subjects.forEach(subject => {
+        const stats = calculate(subject.id);
+        const color = getPercentageColor(
+          stats.percentage,
+          stats.total
+        );
+
+        const percentageText = stats.total === 0
+          ? "—"
+          : stats.percentage.toFixed(1) + "%";
+
+        const card = document.createElement("div");
+        card.className = "card subject-card";
+
+        card.innerHTML = `
+          <h3></h3>
+
+          <div class="percentage ${color}">
+            ${percentageText}
+          </div>
+
+          <div class="progress">
+            <div
+              class="progress-bar ${color}"
+              style="width:${Math.min(stats.percentage, 100)}%"
+            ></div>
+          </div>
+
+          <p class="muted">
+            Present: ${stats.present} |
+            Absent: ${stats.absent}
+          </p>
+
+          <p class="muted">
+            Conducted classes: ${stats.total}
+          </p>
+
+          <div class="advice"></div>
+
+          <div class="subject-actions">
+            <button class="btn-gray btn-small rename-btn">Rename</button>
+            <button class="btn-red btn-small delete-subject-btn">Delete</button>
+          </div>
+        `;
+
+        card.querySelector("h3").textContent = subject.name;
+        card.querySelector(".advice").textContent =
+          calculateAdvice(stats);
+
+        card.querySelector(".rename-btn").addEventListener(
+          "click",
+          () => renameSubject(subject.id)
+        );
+
+        card.querySelector(".delete-subject-btn").addEventListener(
+          "click",
+          () => deleteSubject(subject.id)
+        );
+
+        dashboard.appendChild(card);
+      });
+    }
+
+
+    // -------------------------------------
+    // ADD SUBJECT
+    // -------------------------------------
+
+    $("subjectForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const name = $("subjectName").value.trim();
+
+      if (!name) return;
+
+      const duplicate = subjects.some(subject =>
+        subject.name.toLowerCase() === name.toLowerCase()
+      );
+
+      if (duplicate) {
+        alert("This subject already exists.");
+        return;
+      }
+
+      subjects.push({
+        id: createId(),
+        name
+      });
+
+      $("subjectName").value = "";
+
+      saveData();
+      renderAll();
+    });
+
+
+    // -------------------------------------
+    // RENAME SUBJECT
+    // -------------------------------------
+
+    function renameSubject(subjectId) {
+      const subject = subjects.find(
+        item => item.id === subjectId
+      );
+
+      if (!subject) return;
+
+      const newName = prompt(
+        "Enter the new subject name:",
+        subject.name
+      );
+
+      if (newName === null) return;
+
+      const trimmedName = newName.trim();
+
+      if (!trimmedName) {
+        alert("Subject name cannot be empty.");
+        return;
+      }
+
+      const duplicate = subjects.some(item =>
+        item.id !== subjectId &&
+        item.name.toLowerCase() === trimmedName.toLowerCase()
+      );
+
+      if (duplicate) {
+        alert("Another subject already has this name.");
+        return;
+      }
+
+      subject.name = trimmedName;
+
+      saveData();
+      renderAll();
+    }
+
+
+    // -------------------------------------
+    // DELETE SUBJECT
+    // -------------------------------------
+
+    function deleteSubject(subjectId) {
+      const subject = subjects.find(
+        item => item.id === subjectId
+      );
+
+      if (!subject) return;
+
+      const confirmed = confirm(
+        `Delete "${subject.name}" and all its attendance records? This cannot be undone.`
+      );
+
+      if (!confirmed) return;
+
+      subjects = subjects.filter(
+        item => item.id !== subjectId
+      );
+
+      records = records.filter(
+        record => record.subjectId !== subjectId
+      );
+
+      if (
+        editingRecordId &&
+        !records.some(record => record.id === editingRecordId)
+      ) {
+        cancelEditing();
+      }
+
+      if (activeFilter === subjectId) {
+        activeFilter = "all";
+      }
+
+      saveData();
+      renderAll();
+    }
+
+
+    // -------------------------------------
+    // RECORD ATTENDANCE
+    // -------------------------------------
+
+    function recordAttendance(status) {
+      const subjectId = $("attendanceSubject").value;
+      const date = $("attendanceDate").value;
+
+      if (!subjectId) {
+        alert("Please select a subject first.");
+        return;
+      }
+
+      if (!date) {
+        alert("Please select the class date.");
+        return;
+      }
+
+      if (editingRecordId) {
+        const record = records.find(
+          item => item.id === editingRecordId
+        );
+
+        if (!record) {
+          cancelEditing();
+          return;
+        }
+
+        record.subjectId = subjectId;
+        record.date = date;
+        record.status = status;
+
+        cancelEditing();
+
+      } else {
+        // Every click creates a new class record.
+        // This allows multiple classes on the same date.
+        records.push({
+          id: createId(),
+          subjectId,
+          date,
+          status
+        });
+      }
+
+      saveData();
+      renderAll();
+    }
+
+    $("presentBtn").addEventListener(
+      "click",
+      () => recordAttendance("Present")
+    );
+
+    $("absentBtn").addEventListener(
+      "click",
+      () => recordAttendance("Absent")
+    );
+
+    $("cancelledBtn").addEventListener(
+      "click",
+      () => recordAttendance("Cancelled")
+    );
+
+
+    // -------------------------------------
+    // EDIT ATTENDANCE
+    // -------------------------------------
+
+    function editRecord(recordId) {
+      const record = records.find(
+        item => item.id === recordId
+      );
+
+      if (!record) return;
+
+      editingRecordId = recordId;
+
+      $("attendanceSubject").value = record.subjectId;
+      $("attendanceDate").value = record.date;
+
+      $("editingNote").style.display = "block";
+      $("cancelEditBtn").style.display = "inline-block";
+
+      $("presentBtn").textContent = "Update: Present";
+      $("absentBtn").textContent = "Update: Absent";
+      $("cancelledBtn").textContent = "Update: Cancelled";
+
+      window.scrollTo({
+        top: $("attendanceSubject").getBoundingClientRect().top +
+          window.scrollY - 100,
+        behavior: "smooth"
+      });
+    }
+
+    function cancelEditing() {
+      editingRecordId = null;
+
+      $("editingNote").style.display = "none";
+      $("cancelEditBtn").style.display = "none";
+
+      $("presentBtn").textContent = "✓ Present";
+      $("absentBtn").textContent = "✕ Absent";
+      $("cancelledBtn").textContent = "— Cancelled";
+    }
+
+    $("cancelEditBtn").addEventListener(
+      "click",
+      cancelEditing
+    );
+
+
+    // -------------------------------------
+    // DELETE INDIVIDUAL RECORD
+    // -------------------------------------
+
+    function deleteRecord(recordId) {
+      const confirmed = confirm(
+        "Delete this attendance record?"
+      );
+
+      if (!confirmed) return;
+
+      records = records.filter(
+        record => record.id !== recordId
+      );
+
+      if (editingRecordId === recordId) {
+        cancelEditing();
+      }
+
+      saveData();
+      renderAll();
+    }
+
+
+    // -------------------------------------
+    // ATTENDANCE HISTORY
+    // -------------------------------------
+
+    function renderHistory() {
+      const historyList = $("historyList");
+      historyList.innerHTML = "";
+
+      let filteredRecords = [...records];
+
+      if (activeFilter !== "all") {
+        filteredRecords = filteredRecords.filter(
+          record => record.subjectId === activeFilter
+        );
+      }
+
+      filteredRecords.sort((a, b) => {
+        return b.date.localeCompare(a.date);
+      });
+
+      if (filteredRecords.length === 0) {
+        historyList.innerHTML =
+          '<div class="empty">No attendance records found.</div>';
+        return;
+      }
+
+      filteredRecords.forEach(record => {
+        const subject = subjects.find(
+          item => item.id === record.subjectId
+        );
+
+        if (!subject) return;
+
+        const item = document.createElement("div");
+        item.className = "history-item";
+
+        item.innerHTML = `
+          <div class="history-info">
+            <strong class="subject-name"></strong>
+            <small class="record-date"></small>
+            <br>
+            <span class="status"></span>
+          </div>
+
+          <div class="history-actions">
+            <button class="btn-blue btn-small edit-btn">Edit</button>
+            <button class="btn-red btn-small delete-btn">Delete</button>
+          </div>
+        `;
+
+        item.querySelector(".subject-name").textContent =
+          subject.name;
+
+        item.querySelector(".record-date").textContent =
+          formatDate(record.date);
+
+        const statusElement = item.querySelector(".status");
+        statusElement.textContent = record.status;
+        statusElement.classList.add(
+          "status-" + record.status
+        );
+
+        item.querySelector(".edit-btn").addEventListener(
+          "click",
+          () => editRecord(record.id)
+        );
+
+        item.querySelector(".delete-btn").addEventListener(
+          "click",
+          () => deleteRecord(record.id)
+        );
+
+        historyList.appendChild(item);
+      });
+    }
+
+    function formatDate(dateString) {
+      const [year, month, day] = dateString.split("-");
+
+      return `${day}-${month}-${year}`;
+    }
+
+    $("historyFilter").addEventListener("change", function() {
+      activeFilter = this.value;
+      renderHistory();
+    });
+
+    $("clearFilterBtn").addEventListener("click", function() {
+      activeFilter = "all";
+      $("historyFilter").value = "all";
+      renderHistory();
+    });
+
+
+    // -------------------------------------
+    // EXPORT CSV
+    // -------------------------------------
+
+    function exportCSV() {
+      if (records.length === 0) {
+        alert("There are no attendance records to export.");
+        return;
+      }
+
+      const rows = [
+        ["Date", "Subject", "Status"]
+      ];
+
+      records
+        .slice()
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .forEach(record => {
+          const subject = subjects.find(
+            item => item.id === record.subjectId
+          );
+
+          rows.push([
+            record.date,
+            subject ? subject.name : "Unknown",
+            record.status
+          ]);
+        });
+
+      const csv = rows.map(row =>
+        row.map(value =>
+          '"' + String(value).replace(/"/g, '""') + '"'
+        ).join(",")
+      ).join("\n");
+
+      const blob = new Blob(
+        ["\uFEFF" + csv],
+        { type: "text/csv;charset=utf-8;" }
+      );
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "attendance-records.csv";
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      URL.revokeObjectURL(url);
+    }
+
+    $("exportBtn").addEventListener("click", exportCSV);
+
+
+    // -------------------------------------
+    // RENDER EVERYTHING
+    // -------------------------------------
+
+    function renderAll() {
+      renderSubjectDropdowns();
+      renderDashboard();
+      renderHistory();
+    }
+
+
+    // -------------------------------------
+    // INITIALIZE APP
+    // -------------------------------------
+
+    loadData();
+
+    $("attendanceDate").value =
+      new Date().toLocaleDateString("en-CA");
+
+    renderAll();
+
+  </script>
+</body>
+</html>
+```
